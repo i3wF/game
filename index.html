@@ -84,13 +84,17 @@
             }
 
             attempts++;
-
+            if (guess == randomNumber) {
+                result.textContent = "🎉 Correct! The number was " + randomNumber;
+                const score = (maxAttempts - attempts + 1) * 50;
+                
+            }
             if (guess === randomNumber) {
-                result.textContent = `🎉 Correct! The number was ${randomNumber}.`;
+                result.textContent = "🎉 Correct! The number was " + randomNumber;
                 result.style.color = "lightgreen";
-                score = (maxAttempts - attempts + 1) * 50; // Higher score for fewer attempts
+                const score = (maxAttempts - attempts + 1) * 50;
                 scoreDisplay.textContent = `Your score: ${score}`;
-                sendScoreToChat(score); // Send score to the chat
+                sendScore(score);
                 document.getElementById("guess").disabled = true;
                 resetButton.style.display = "block";
             } else if (attempts < maxAttempts) {
@@ -102,19 +106,18 @@
                 result.textContent = `❌ Game Over! The correct number was ${randomNumber}.`;
                 result.style.color = "red";
                 scoreDisplay.textContent = "Your score: 0";
-                sendScoreToChat(0); // Send score to the chat
+                sendScore(0);
                 document.getElementById("guess").disabled = true;
                 resetButton.style.display = "block";
             }
         }
 
-        function sendScoreToChat(score) {
+        function sendScore(score) {
             if (window.TelegramGameProxy) {
+                TelegramGameProxy.score = score;
                 TelegramGameProxy.close();
-                alert(`Your score of ${score} has been sent to the chat!`);
             } else {
-                console.log(`Score sent to chat: ${score}`);
-                alert(`Your score: ${score} (Telegram integration simulated).`);
+                alert("Telegram integration is not available.");
             }
         }
 
