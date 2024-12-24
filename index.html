@@ -8,45 +8,115 @@
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            margin-top: 20px;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(to bottom, #6a11cb, #2575fc);
+            color: white;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
         }
         input {
             padding: 10px;
             font-size: 16px;
+            width: 60px;
+            border: 2px solid white;
+            border-radius: 5px;
+            margin-right: 10px;
+            text-align: center;
         }
         button {
             padding: 10px 20px;
             font-size: 16px;
+            background-color: white;
+            color: #2575fc;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #f0f0f0;
         }
         #result {
             margin-top: 20px;
-            font-size: 18px;
-            color: green;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        #score {
+            margin-top: 10px;
+            font-size: 1.2em;
+            color: yellow;
+        }
+        #reset {
+            margin-top: 20px;
+            display: none;
         }
     </style>
 </head>
 <body>
     <h1>Guess the Number</h1>
-    <p>Guess a number between 1 and 10:</p>
-    <input type="number" id="guess" min="1" max="10">
+    <p>Guess a number between <strong>1</strong> and <strong>10</strong>:</p>
+    <input type="number" id="guess" min="1" max="10" placeholder="1-10">
     <button onclick="checkGuess()">Submit</button>
     <p id="result"></p>
+    <p id="score"></p>
+    <button id="reset" onclick="resetGame()">Play Again</button>
 
     <script>
-        const randomNumber = Math.floor(Math.random() * 10) + 1;
+        let randomNumber = Math.floor(Math.random() * 10) + 1;
+        let attempts = 0;
+        let maxAttempts = 3;
+        let score = 0;
 
         function checkGuess() {
-            const guess = document.getElementById("guess").value;
+            const guess = parseInt(document.getElementById("guess").value);
             const result = document.getElementById("result");
+            const scoreDisplay = document.getElementById("score");
+            const resetButton = document.getElementById("reset");
 
-            if (guess == randomNumber) {
-                result.textContent = "🎉 Correct! The number was " + randomNumber;
-                TelegramGameProxy.score = 100;
-            } else if (guess < randomNumber) {
-                result.textContent = "📉 Too low! Try again.";
-            } else {
-                result.textContent = "📈 Too high! Try again.";
+            if (isNaN(guess) || guess < 1 || guess > 10) {
+                result.textContent = "⚠️ Please enter a number between 1 and 10!";
+                result.style.color = "red";
+                return;
             }
+
+            attempts++;
+
+            if (guess === randomNumber) {
+                result.textContent = `🎉 Correct! The number was ${randomNumber}.`;
+                result.style.color = "lightgreen";
+                score = (maxAttempts - attempts + 1) * 50; // Higher score for fewer attempts
+                scoreDisplay.textContent = `Your score: ${score}`;
+                TelegramGameProxy.score = score; // Update score for Telegram Game Proxy
+                document.getElementById("guess").disabled = true;
+                resetButton.style.display = "block";
+            } else if (attempts < maxAttempts) {
+                result.textContent = guess < randomNumber 
+                    ? "📉 Too low! Try again." 
+                    : "📈 Too high! Try again.";
+                result.style.color = "orange";
+            } else {
+                result.textContent = `❌ Game Over! The correct number was ${randomNumber}.`;
+                result.style.color = "red";
+                scoreDisplay.textContent = "Your score: 0";
+                TelegramGameProxy.score = 0; // Update score for Telegram Game Proxy
+                document.getElementById("guess").disabled = true;
+                resetButton.style.display = "block";
+            }
+        }
+
+        function resetGame() {
+            randomNumber = Math.floor(Math.random() * 10) + 1;
+            attempts = 0;
+            score = 0;
+            document.getElementById("guess").value = "";
+            document.getElementById("guess").disabled = false;
+            document.getElementById("result").textContent = "";
+            document.getElementById("score").textContent = "";
+            document.getElementById("reset").style.display = "none";
         }
     </script>
 </body>
