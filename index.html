@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess the Number</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 20px;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <h1>Guess the Number</h1>
+    <p>Guess a number between 1 and 10:</p>
+    <input type="number" id="guess" min="1" max="10">
+    <button onclick="checkGuess()">Submit</button>
+    <p id="result"></p>
+
+    <script>
+        const randomNumber = Math.floor(Math.random() * 10) + 1;
+
+        function checkGuess() {
+            const guess = document.getElementById("guess").value;
+            const result = document.getElementById("result");
+
+            if (guess == randomNumber) {
+                result.textContent = "🎉 Correct! The number was " + randomNumber;
+                TelegramGameProxy.score = 100;
+            } else if (guess < randomNumber) {
+                result.textContent = "📉 Too low! Try again.";
+            } else {
+                result.textContent = "📈 Too high! Try again.";
+            }
+        }
+    </script>
+</body>
+</html>
